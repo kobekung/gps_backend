@@ -1,0 +1,28 @@
+
+# Node modules
+node_modules/
+
+# Environment variables
+.env
+
+package-lock.json
+
+# Prisma: ignore generated artifacts
+.prisma/
+prisma/migrations/
+prisma/dev.db
+prisma/dev.db-journal
+
+# If you generate Prisma client elsewhere
+generated/
+generated/prisma/
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Lock file (optional: ถ้าไม่ต้องการ track)
+# package-lock.json
