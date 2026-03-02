@@ -19,12 +19,13 @@ CREATE TABLE IF NOT EXISTS companies (
 -- USERS
 CREATE TABLE IF NOT EXISTS users (
   id            UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  company_id    UUID REFERENCES companies(id) ON DELETE SET NULL,
-  email         VARCHAR(255) UNIQUE NOT NULL,
-  password_hash TEXT NOT NULL,
+  company_id    UUID REFERENCES companies(id) ON DELETE CASCADE,
+  email         VARCHAR(255) UNIQUE,  -- เอา NOT NULL ออก เพื่อให้คนขับไม่ต้องมีอีเมล
+  password_hash TEXT,                 -- เอา NOT NULL ออก
   role          VARCHAR(20) NOT NULL CHECK (role IN ('superadmin','admin','driver')),
-  full_name     VARCHAR(255),
+  full_name     VARCHAR(255),         -- คนขับตั้งเองตอนเข้าแอปครั้งแรก
   phone         VARCHAR(20),
+  photo_url     TEXT,                 -- รูปโปรไฟล์คนขับ
   is_active     BOOLEAN DEFAULT true,
   created_at    TIMESTAMP DEFAULT NOW(),
   updated_at    TIMESTAMP DEFAULT NOW()
@@ -57,11 +58,11 @@ CREATE TABLE IF NOT EXISTS subscriptions (
 CREATE TABLE IF NOT EXISTS vehicles (
   id            UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   company_id    UUID REFERENCES companies(id) ON DELETE CASCADE,
-  license_plate VARCHAR(20),
-  vehicle_type  VARCHAR(50),
+  license_plate VARCHAR(20) NOT NULL, -- แอดมินเป็นคนจัดการทะเบียน
+  vehicle_type  VARCHAR(50), 
   color         VARCHAR(30),
-  icon_type     VARCHAR(50) DEFAULT 'car',
-  photo_url     TEXT,
+  icon_type     VARCHAR(50) DEFAULT 'car', -- คนขับกดเปลี่ยนจากในแอปได้ตลอด
+  photo_url     TEXT,                      -- คนขับถ่ายรูปรถอัปโหลดได้
   is_active     BOOLEAN DEFAULT true,
   created_at    TIMESTAMP DEFAULT NOW(),
   updated_at    TIMESTAMP DEFAULT NOW()
@@ -70,11 +71,11 @@ CREATE TABLE IF NOT EXISTS vehicles (
 -- DRIVER DEVICES (UUID จาก App)
 CREATE TABLE IF NOT EXISTS driver_devices (
   id              UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  user_id         UUID REFERENCES users(id) ON DELETE CASCADE,
-  vehicle_id      UUID REFERENCES vehicles(id) ON DELETE SET NULL,
-  app_uuid        VARCHAR(255) UNIQUE,
+  user_id         UUID REFERENCES users(id) ON DELETE CASCADE,     -- ผูกกับโปรไฟล์คนขับ
+  vehicle_id      UUID REFERENCES vehicles(id) ON DELETE SET NULL, -- เครื่องนี้ผูกกับรถทะเบียนอะไร
+  app_uuid        VARCHAR(255) UNIQUE NOT NULL,
   is_verified     BOOLEAN DEFAULT false,
-  verified_by     UUID REFERENCES users(id),
+  verified_by     UUID REFERENCES users(id), -- แอดมินคนที่กดยืนยัน
   verified_at     TIMESTAMP,
   created_at      TIMESTAMP DEFAULT NOW()
 );
@@ -84,9 +85,6 @@ CREATE TABLE IF NOT EXISTS driver_sessions (
   id              UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   driver_id       UUID REFERENCES users(id) ON DELETE CASCADE,
   vehicle_id      UUID REFERENCES vehicles(id) ON DELETE SET NULL,
-  color           VARCHAR(30),
-  icon_type       VARCHAR(50),
-  photo_url       TEXT,
   checked_in_at   TIMESTAMP DEFAULT NOW(),
   checked_out_at  TIMESTAMP,
   status          VARCHAR(20) DEFAULT 'active' CHECK (status IN ('active','ended'))

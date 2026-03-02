@@ -17,9 +17,19 @@ const registerDevice = async (req, res) => {
 const verifyDevice = async (req, res) => {
   try {
     const { app_uuid, vehicle_id } = req.body
-    const data = await service.verifyDevice(app_uuid, vehicle_id, req.user.id)
+    
+    // 🔴 สิ่งที่แก้: เพิ่ม req.user.company_id ในตำแหน่งที่ 3 และ req.user.id (คนอนุมัติ) ในตำแหน่งที่ 4
+    const data = await service.verifyDevice(
+      app_uuid, 
+      vehicle_id, 
+      req.user.company_id, 
+      req.user.id
+    )
+    
     return success(res, data, 'Device verified')
-  } catch (err) { return error(res, err.message, err.status || 500) }
+  } catch (err) { 
+    return error(res, err.message, err.status || 500) 
+  }
 }
 
 module.exports = { getDevices, registerDevice, verifyDevice }

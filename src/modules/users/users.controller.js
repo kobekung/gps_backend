@@ -4,6 +4,8 @@ const { success, error } = require('../../utils/response')
 const getByCompany = async (req, res) => {
   try {
     const company_id = req.user.role === 'superadmin' ? req.params.companyId : req.user.company_id
+    console.log(company_id);
+    
     const data = await service.getUsersByCompany(company_id)
     return success(res, data)
   } catch (err) {
@@ -31,5 +33,19 @@ const updateUser = async (req, res) => {
     return error(res, err.message, err.status || 500)
   }
 }
+const updateProfile = async (req, res) => {
+  try {
+    // console.log("body===",req.body);
+    const userId = req.user.id; // ดึง ID จาก Token ของคนที่ล็อกอินอยู่
+    const { full_name, phone } = req.body;
+    
+    
+    // เรียกใช้ฟังก์ชันอัปเดต
+    const updatedUser = await service.updateUser(userId, { full_name, phone });
+    return success(res, updatedUser, 'Profile updated successfully');
+  } catch (err) {
+    return error(res, err.message, err.status || 500);
+  }
+}
 
-module.exports = { getByCompany, createDriver, updateUser }
+module.exports = { getByCompany, createDriver, updateUser,updateProfile }

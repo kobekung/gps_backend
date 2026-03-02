@@ -21,5 +21,22 @@ const getMe = async (req, res) => {
     return error(res, err.message, err.status || 500)
   }
 }
+const deviceLogin = async (req, res) => {
+  try {
+    const { app_uuid } = req.body
+    const result = await service.deviceLogin(app_uuid)
+    
+    if (result.status === 'pending') {
+      return res.status(202).json({ 
+        success: false, 
+        message: 'Device registered. Waiting for admin verification.' 
+      })
+    }
+    
+    return success(res, result, 'Auto login successful')
+  } catch (err) {
+    return error(res, err.message, err.status || 500)
+  }
+}
 
-module.exports = { login, getMe }
+module.exports = { login, getMe, deviceLogin }

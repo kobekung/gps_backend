@@ -19,6 +19,7 @@ router.post('/drivers', authenticate, authorize('admin'),
 )
 
 // PATCH /api/users/:id
+router.patch('/profile', authenticate, controller.updateProfile)
 router.patch('/:id', authenticate, authorize('admin', 'superadmin'), controller.updateUser)
 
 module.exports = router

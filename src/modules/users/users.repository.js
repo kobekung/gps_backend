@@ -1,10 +1,11 @@
 const db = require('../../database/db')
 
 const findByCompany = async (company_id) => {
-  const { rows } = await db.query(
-    'SELECT id, email, role, full_name, phone, is_active, created_at FROM users WHERE company_id = $1 ORDER BY created_at DESC',
-    [company_id]
-  )
+  const query = company_id === undefined
+    ? 'SELECT id, email, role, full_name, phone, is_active, created_at FROM users ORDER BY created_at DESC'
+    : `SELECT id, email, role, full_name, phone, is_active, created_at FROM users WHERE company_id = $1 ORDER BY created_at DESC`
+  const params = company_id === undefined ? [] : [company_id]
+  const { rows } = await db.query(query, params)
   return rows
 }
 

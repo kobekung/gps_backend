@@ -9,8 +9,9 @@ const getActive = async (driver_id) => {
 }
 
 const getByCompany = async (company_id) => {
+  // ดึง icon_type, color มาจากตาราง vehicles แทน
   const { rows } = await db.query(`
-    SELECT ds.*, u.full_name as driver_name, v.license_plate, v.icon_type
+    SELECT ds.*, u.full_name as driver_name, v.license_plate, v.icon_type, v.color
     FROM driver_sessions ds
     JOIN users u ON u.id = ds.driver_id
     LEFT JOIN vehicles v ON v.id = ds.vehicle_id
@@ -21,15 +22,19 @@ const getByCompany = async (company_id) => {
 }
 
 const create = async (data) => {
-  const { driver_id, vehicle_id, color, icon_type, photo_url } = data
+  // เอา color, icon_type, photo_url ออก เพราะค่าพวกนี้ไปอยู่ที่ vehicles แล้ว
+  const { driver_id, vehicle_id } = data 
+
   // End any existing active session first
   await db.query(
     "UPDATE driver_sessions SET status='ended', checked_out_at=NOW() WHERE driver_id=$1 AND status='active'",
     [driver_id]
   )
+  
+  // Insert แค่ driver_id และ vehicle_id
   const { rows } = await db.query(
-    'INSERT INTO driver_sessions (driver_id, vehicle_id, color, icon_type, photo_url) VALUES ($1,$2,$3,$4,$5) RETURNING *',
-    [driver_id, vehicle_id, color, icon_type, photo_url]
+    'INSERT INTO driver_sessions (driver_id, vehicle_id) VALUES ($1,$2) RETURNING *',
+    [driver_id, vehicle_id]
   )
   return rows[0]
 }

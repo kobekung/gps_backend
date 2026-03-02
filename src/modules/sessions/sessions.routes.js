@@ -6,7 +6,8 @@ const { imageUpload } = require('../../config/upload')
 
 // Driver endpoints
 router.get('/my', authenticate, authorize('driver'), controller.getActive)
-router.post('/checkin', authenticate, authorize('driver'), imageUpload.single('photo'), controller.checkIn)
+// router.post('/checkin', authenticate, authorize('driver'), imageUpload.single('photo'), controller.checkIn)
+router.post('/checkin', authenticate, imageUpload.single('photo'), controller.checkIn)
 router.patch('/:sessionId/checkout', authenticate, authorize('driver'), controller.checkOut)
 
 // Admin: view all active sessions in company
